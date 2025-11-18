@@ -15,7 +15,7 @@ class GenerationPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Hero(
-          tag: 'logo',
+          tag: 'logo_generation',
           child: Material(color: Colors.transparent, child: Text('Generation')),
         ),
       ),

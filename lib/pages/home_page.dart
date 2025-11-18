@@ -16,7 +16,7 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Hero(
-          tag: 'logo',
+          tag: 'logoText',
           child: Material(color: Colors.transparent, child: Text('Pokedle')),
         ),
         actions: [

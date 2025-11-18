@@ -2,7 +2,6 @@ class Pokemon {
   final int id;
   final String name; // english
   final List<String> type;
-  final Map<String, int> base;
   final int generation; // 1..9
   final String? imageAsset; // we store a URL (thumbnail/sprite)
   final Map<String, dynamic>? evolution; // <-- NEW
@@ -11,7 +10,6 @@ class Pokemon {
     required this.id,
     required this.name,
     required this.type,
-    required this.base,
     required this.generation,
     this.imageAsset,
     this.evolution, // <-- NEW
@@ -31,11 +29,6 @@ class Pokemon {
       type:
           (j['type'] as List?)?.map((e) => '$e').cast<String>().toList() ??
           const [],
-      base:
-          (j['base'] as Map?)?.map(
-            (k, v) => MapEntry('$k', int.tryParse('$v') ?? 0),
-          ) ??
-          {},
       generation: gen,
       imageAsset:
           (j['image']?['thumbnail'] as String?) ??

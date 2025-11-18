@@ -89,7 +89,6 @@ class GameProvider with ChangeNotifier {
         id: -1,
         name: name,
         type: const [],
-        base: const {},
         generation: 0,
         evolution: null,
       ),
