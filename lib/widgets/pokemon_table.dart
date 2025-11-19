@@ -34,16 +34,11 @@ class PokemonTableHeader extends StatelessWidget {
   );
 }
 
-/// A single stacked row for one guessed Pokémon
 class PokemonTableRow extends StatelessWidget {
   final Pokemon p;
-
-  /// status map: {'gen': bool, 'stage': bool, 'fully': bool, 'name': bool}
-  /// (type correctness is computed here from [targetTypes] so we can show
-  /// green/yellow/red per column)
   final Map<String, bool> status;
 
-  /// Target Pokémon's types (e.g., ['Fire'] or ['Water','Flying'])
+  /// Target Pokémon’s types (e.g. ["Water"], ["Rock","Ground"])
   final List<String> targetTypes;
 
   const PokemonTableRow({
@@ -53,7 +48,7 @@ class PokemonTableRow extends StatelessWidget {
     required this.targetTypes,
   });
 
-  // Evo helpers (based on JSON: evolution.prev / evolution.next)
+  // Evolution helpers
   static int stageOf(Map<String, dynamic>? evo) {
     if (evo == null) return 1;
     final hasPrev = evo['prev'] != null;
@@ -79,36 +74,58 @@ class PokemonTableRow extends StatelessWidget {
 
     final cs = Theme.of(context).colorScheme;
 
-    // Choose explicit colors so semantics are clear:
     final Color correctColor = Colors.green.shade300;
-    final Color misplacedColor =
-        Colors.amber.shade300; // "included but wrong place"
+    final Color misplacedColor = Colors.yellow.shade300;
     final Color wrongColor = Colors.red.shade300;
 
-    // Normalize types
-    final guessedT1 = p.type.isNotEmpty ? p.type[0] : 'None';
-    final guessedT2 = p.type.length > 1 ? p.type[1] : 'None';
-    final tgt = targetTypes.map((e) => e.toLowerCase()).toList(growable: false);
+    // Guess types & whether they exist
+    final hasGuessT1 = p.type.isNotEmpty;
+    final hasGuessT2 = p.type.length > 1;
+    final guessedT1 = hasGuessT1 ? p.type[0] : 'None';
+    final guessedT2 = hasGuessT2 ? p.type[1] : 'None';
+
+    // Target types & whether it has type2
+    final tgt = targetTypes.map((e) => e.toLowerCase()).toList();
+    final hasTargetT1 = tgt.isNotEmpty;
+    final hasTargetT2 = tgt.length > 1;
+
     final g1 = guessedT1.toLowerCase();
     final g2 = guessedT2.toLowerCase();
 
-    // Determine match state for each type column
+    // ---- TYPE 1 COLOR ----
     Color type1Bg = wrongColor;
-    Color type2Bg = wrongColor;
-
-    if (guessedT1 != 'None') {
-      final posOk = tgt.isNotEmpty && g1 == tgt[0];
+    if (!hasGuessT1 && !hasTargetT1) {
+      // basically never happens, but for completeness
+      type1Bg = correctColor;
+    } else if (hasGuessT1 && hasTargetT1) {
+      final posOk = g1 == tgt[0];
       final inSet = tgt.contains(g1);
       type1Bg = posOk ? correctColor : (inSet ? misplacedColor : wrongColor);
+    } else {
+      // one has type1, the other doesn't
+      type1Bg = wrongColor;
     }
 
-    if (guessedT2 != 'None') {
-      final posOk = tgt.length > 1 && g2 == tgt.elementAt(1);
+    // ---- TYPE 2 COLOR ----
+    Color type2Bg = wrongColor;
+
+    if (!hasGuessT2 && !hasTargetT2) {
+      // Target and guess are both single-type (e.g. Water / None)
+      type2Bg = correctColor;
+    } else if (hasGuessT2 && !hasTargetT2) {
+      // Guess has extra second type, target does not
+      type2Bg = wrongColor;
+    } else if (!hasGuessT2 && hasTargetT2) {
+      // Target has second type, guess doesn't
+      type2Bg = wrongColor;
+    } else {
+      // Both have a real Type 2
+      final posOk = g2 == tgt[1];
       final inSet = tgt.contains(g2);
       type2Bg = posOk ? correctColor : (inSet ? misplacedColor : wrongColor);
     }
 
-    // Stage / Fully / Gen colors (green=match, red=mismatch as before)
+    // Stage / Fully / Gen colors
     final stage = stageOf(p.evolution);
     final fully = fullyEvolved(p.evolution);
 
@@ -136,9 +153,8 @@ class PokemonTableRow extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Pokémon column: image on top, name below (centered), narrower width
+          // Pokémon column: image on top, name below
           Expanded(
             flex: 2,
             child: Container(
@@ -175,23 +191,18 @@ class PokemonTableRow extends StatelessWidget {
           ),
 
           const SizedBox(width: 8),
-          // Type 1 with green/yellow/red
           pill(guessedT1, type1Bg),
 
           const SizedBox(width: 8),
-          // Type 2 with green/yellow/red
           pill(guessedT2, type2Bg),
 
           const SizedBox(width: 8),
-          // Stage: green if same stage as target, else red
           pill('$stage', okColor(status['stage'] ?? false)),
 
           const SizedBox(width: 8),
-          // Fully evolved: green if same as target, else red
           pill(fully ? 'Yes' : 'No', okColor(status['fully'] ?? false)),
 
           const SizedBox(width: 8),
-          // Gen: green if same as target, else red
           pill('${p.generation}', okColor(status['gen'] ?? false)),
         ],
       ),
