@@ -1,16 +1,30 @@
-# mobile_dev
+# Pokedle
 
-A new Flutter project.
+A Flutter-based guessing game inspired by Wordle but with Pokémon! This app uses Provider for state management, dynamic theming, and local storage.
 
-## Getting Started
+## 📱 Overview
 
-This project is a starting point for a Flutter application.
+Pokedle is a mobile game where players guess a Pokémon based on clues. The project includes a modular architecture with providers, repository services, theme management, and asset-based Pokémon data.
 
-A few resources to get you started if this is your first Flutter project:
+## 🚀 Features
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+* MultiProvider architecture
+* Game logic handled by `GameProvider`
+* Persistent theme mode using `ThemeController`
+* Pokémon data loaded via `PokemonRepository`
+* Local storage support via `StorageService`
+* Light, Dark, and System theme modes
+* JSON-based Pokémon dataset
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## ▶️ Running the App
+
+```
+flutter pub get
+flutter run
+```
+
+## 🧪 Testing
+
+```
+flutter test
+```
